@@ -10,5 +10,5 @@ export default defineConfig({
   server: {
     host: true
   },
-  base: '/flow-invoice/'
+  base: process.env.NODE_ENV === "production" ? '/flow-invoice/' : '/'
 })

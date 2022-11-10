@@ -1,6 +1,32 @@
 <template>
   <div class="bg-white py-16 sm:py-24">
-    <div class="relative sm:py-16">
+
+    <TransitionRoot as="template" :show="state.overlayOpen">
+      <Dialog as="div" class="relative z-10" @close="state.overlayOpen = false">
+        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+          <div class="flex min-h-full items-end justify-center p-4 sm:items-center sm:p-0">
+            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-slate-100 px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <div>
+                  <InvoiceDetails :invoice="invoice.data" />
+                </div>
+                <div class="mt-5 sm:mt-6">
+                  <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm" @click="state.overlayOpen = false">
+                    Close this window
+                  </button>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </TransitionRoot>
+
+    <div class="relative sm:py-16 mb-10">
       <div aria-hidden="true" class="hidden sm:block">
         <div class="absolute inset-y-0 left-0 w-1/2 rounded-r-3xl bg-gray-50" />
         <svg class="absolute top-8 left-1/2 -ml-3" width="404" height="392" fill="none" viewBox="0 0 404 392">
@@ -24,14 +50,38 @@
             <div class="sm:text-center">
               <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">View your outstanding Flow invoices.</h2>
               <p class="mx-auto mt-6 max-w-2xl text-lg text-indigo-200">Enter your account number below to view your outstanding invoices.</p>
+              <TransitionRoot
+                :show="state.error"
+                enter="transition-opacity duration-300"
+                enter-from="opacity-0 -translate-y-2"
+                enter-to="opacity-100 translate-y-0"
+                leave="transition-opacity duration-200"
+                leave-from="opacity-100 translate-y-0"
+                leave-to="opacity-0 -translate-y-2"
+              >
+                <Alert class="mt-6 max-w-xl mx-auto">
+                  Invalid account number. Please try again.
+                </Alert>
+              </TransitionRoot>
             </div>
-            <form action="#" class="mt-12 sm:mx-auto sm:flex sm:max-w-lg">
+            <form @submit.prevent class="mt-12 sm:mx-auto sm:flex sm:max-w-lg">
               <div class="min-w-0 flex-1">
                 <label for="cta-email" class="sr-only">Account number</label>
-                <input id="cta-email" type="number" class="block w-full rounded-md border border-transparent px-5 py-3 text-base text-gray-900 placeholder-gray-500 shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600" placeholder="Account number" />
+                <input :class="{'disabled:bg-slate-200 cursor-not-allowed transition-all duration-200': state.loading}" :disabled="state.loading" @keydown.esc="state.overlayOpen = !state.overlayOpen" ref="accountInput" v-model="account.number" id="accountNumber" type="text" autocomplete="off" class="block w-full rounded-md border border-transparent px-5 py-3 text-base text-gray-900 placeholder-gray-500 shadow-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600" placeholder="Account number" />
               </div>
               <div class="mt-4 sm:mt-0 sm:ml-3">
-                <button type="submit" class="block w-full rounded-md border border-transparent bg-indigo-500 px-5 py-3 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10">View invoices</button>
+                <button :disabled="state.loading" data-button @click="fetchAccountDetails()" class="block w-full rounded-md border border-transparent bg-indigo-500 px-5 py-3 text-base font-medium text-white shadow hover:bg-indigo-400 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600 sm:px-10">
+                  <span class="flex items-center hidden" ref="buttonLoadingLabel">
+                    <svg class="animate-spin -ml-1 mr-3 -mt-1 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Retrieving invoice data...</span>
+                  </span>
+                  <span ref="buttonLabel">
+                    View invoices
+                  </span>
+                </button>
               </div>
             </form>
           </div>
@@ -42,5 +92,65 @@
 </template>
 
 <script setup>
-defineProps({});
+import '@rvanbaalen/transitionjs/src/transitions.css';
+import {getAccountDetails, loadAccountNumber} from "./accountService.js";
+import {onMounted, reactive, ref, watch} from "vue";
+import {toggleTransition} from "@rvanbaalen/transitionjs";
+import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
+import Alert from "./components/Alert.vue";
+import InvoiceDetails from "./components/InvoiceDetails.vue";
+
+let account = reactive({number: ""});
+loadAccountNumber()
+  .then((acc) => {
+    account.number = acc;
+  });
+
+const accountInput = ref();
+onMounted(() => {
+  accountInput.value.focus();
+});
+
+let state = reactive({
+  loading: false,
+  error: false,
+  overlayOpen: false
+});
+
+let invoice = reactive({
+  data: false
+});
+
+watch(() => state.loading, () => {
+  toggleLoadingState();
+});
+
+const buttonLabel = ref();
+const buttonLoadingLabel = ref();
+const toggleLoadingState = async () => {
+  await toggleTransition([buttonLabel.value, buttonLoadingLabel.value], {
+    transition: 'fade',
+    state: !state.loading
+  });
+};
+
+const fetchAccountDetails = async () => {
+  state.loading = true;
+  state.error = false;
+
+  try {
+    invoice.data = await getAccountDetails({accountNumber: account.number});
+    state.overlayOpen = true;
+    console.log('invoice', invoice.data.value);
+    console.log('open', state.overlayOpen);
+  } catch (e) {
+    if (e === false) {
+      state.error = true;
+    } else {
+      console.error(e);
+    }
+  } finally {
+    state.loading = false;
+  }
+};
 </script>
