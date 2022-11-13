@@ -10,5 +10,8 @@ export default defineConfig({
   server: {
     host: true
   },
-  base: process.env.NODE_ENV === "production" ? '/flow-invoice/' : '/'
+  base: process.env.NODE_ENV === "production" ? '/flow-invoice/' : '/',
+  define: {
+    '__APP_VERSION__': JSON.stringify(process.env.npm_package_version)
+  }
 })
