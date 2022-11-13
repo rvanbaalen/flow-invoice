@@ -1,6 +1,3 @@
-import {addItemToLocalStorageHistory} from "./historyService.js";
-import {randomString} from "./utilities.js";
-
 export async function getAccountDetails({accountNumber}) {
     return new Promise((resolve, reject) => {
         fetch(`https://uts.cw/outstanding.php?id=${accountNumber}`)
