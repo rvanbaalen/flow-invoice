@@ -15,6 +15,6 @@ export async function getAccountDetails({accountNumber}) {
             })
             .catch(error => {
                 reject(false);
-            })
+            });
     });
 }

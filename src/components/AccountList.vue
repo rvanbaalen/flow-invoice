@@ -13,7 +13,7 @@
             <span v-if="accountIndex !== accountsByDate.length - 1" class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true" />
             <div class="relative flex space-x-3">
               <div>
-                <span :title="account.due ? 'Account was over due' : 'Account was paid in full'" :class="[account.due ? 'bg-rose-700' : 'bg-green-700', 'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white']">
+                <span :title="account.due ? 'Account was overdue' : 'Account was paid in full'" :class="[account.due ? 'bg-rose-700' : 'bg-green-700', 'h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white']">
                   <DocumentTextIcon class="h-5 w-5 text-white" aria-hidden="true" />
                 </span>
               </div>
