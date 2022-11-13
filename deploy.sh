@@ -15,7 +15,7 @@ echo > .nojekyll
 # if you are deploying to a custom domain
 # echo 'www.example.com' > CNAME
 
-PACKAGE_VERSION=$(cat package.json \
+PACKAGE_VERSION=$(cat ./package.json \
   | grep version \
   | head -1 \
   | awk -F: '{ print $2 }' \
@@ -24,7 +24,7 @@ PACKAGE_VERSION=$(cat package.json \
 git init
 git checkout -B main
 git add -A
-git commit -m "Deploy v$PACKAGE_VERSION"
+git commit -m "Deploy v${PACKAGE_VERSION}"
 
 git push -f git@github.com:rvanbaalen/flow-invoice.git main:gh-pages
 
