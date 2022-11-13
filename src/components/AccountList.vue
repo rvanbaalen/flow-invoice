@@ -17,8 +17,10 @@
                   <DocumentTextIcon class="h-5 w-5 text-white" aria-hidden="true" />
                 </span>
               </div>
-              <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+              <div class="flex min-w-0 flex-1 items-center justify-between space-x-4">
                 <div>
+                  <span class="text-sm cursor-pointer" :title="account.label ? 'Click to edit' : ''" :class="[!account.label ? 'text-slate-400' : '']" v-if="editLabel !== account.id" @click.stop="editLabel = account.id">{{ account.label || 'Click to add a label' }}</span>
+                  <input ref="accountLabelInput" @keyup.enter="editLabel = false" v-show="editLabel === account.id" type="text" class="inline-block px-2 py-1 text-xs flex-shrink rounded-sm mb-1" v-model="account.label" placeholder="Add label" />
                   <p class="text-sm text-gray-500">
                     <a href="#" @click.stop="$emit('selectAccount', account)" class="font-medium text-slate-900 group-hover:text-indigo-600 transition-all duration-200 group-hover:cursor-pointer mr-3">
                       {{ account.number }}
@@ -58,6 +60,7 @@ import {DocumentTextIcon} from "@heroicons/vue/24/outline";
 import dayjs from "dayjs";
 import Duration from "dayjs/esm/plugin/duration";
 import RelativeTime from "dayjs/esm/plugin/relativeTime";
+import {ref, watch} from "vue";
 
 dayjs.extend(Duration);
 dayjs.extend(RelativeTime);
@@ -67,6 +70,15 @@ defineProps({});
 
 const store = useAccountStore();
 const { accountsByDate } = storeToRefs(store);
+
+let editLabel = ref('');
+const accountLabelInput = ref();
+
+watch(() => editLabel, (value) => {
+  if (value) {
+    accountLabelInput.value.focus();
+  }
+});
 
 const calculateDiff = (timestamp) => {
   const diff = dayjs.duration(dayjs(timestamp).diff(dayjs()));

@@ -1,11 +1,13 @@
 import { defineStore } from "pinia";
 import { useStorage } from "@vueuse/core";
 
+const randomId = () => Math.random().toString(36).substr(2, 9);
+
 export const useAccountStore = defineStore('accountList',{
     state: () => {
         return {
             accounts: useStorage('accounts', []),
-            id: useStorage('accountId', 0),
+            id: useStorage('accountId', randomId()),
         };
     },
     getters: {
@@ -20,7 +22,16 @@ export const useAccountStore = defineStore('accountList',{
     },
     actions: {
         addAccount(account) {
-            this.accounts.push({...account, id: this.id++, timestamp: Date.now(), selected: false});
+            let label = '';
+            let previousAccount = this.getAccountByNumber(account.number);
+            if (previousAccount) {
+                label = previousAccount.label;
+            }
+
+            this.accounts.push({...account, label, id: randomId(), timestamp: Date.now(), selected: false});
+        },
+        getAccountByNumber(accountNumber) {
+            return this.accounts.find(account => account.number === accountNumber);
         },
         deleteAccount(id) {
             this.accounts = this.accounts.filter(account => account.id !== id);
