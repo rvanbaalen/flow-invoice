@@ -23,7 +23,7 @@
                   <input ref="accountLabelInput" @keyup.enter="editLabel = false" v-show="editLabel === account.id" type="text" class="inline-block px-2 py-1 text-xs flex-shrink rounded-sm mb-1" v-model="account.label" placeholder="Add label" />
                   <p class="text-sm text-gray-500">
                     <a href="#" @click.stop="$emit('selectAccount', account)" class="font-medium text-slate-900 group-hover:text-indigo-600 transition-all duration-200 group-hover:cursor-pointer mr-3">
-                      {{ account.number }}
+                      Account #{{ account.number }}
                     </a>
                     <span :class="[account.due ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800']" class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium">
                       {{ account.due ? 'Overdue' : 'Paid in full' }}
