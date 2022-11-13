@@ -25,7 +25,8 @@ export const useAccountStore = defineStore('accountList',{
             let label = '';
             let previousAccount = this.getAccountByNumber(account.number);
             if (previousAccount) {
-                label = previousAccount.label;
+                this.updateAccount(previousAccount, {timestamp: Date.now()});
+                return;
             }
 
             this.accounts.push({...account, label, id: randomId(), timestamp: Date.now(), selected: false});
@@ -35,6 +36,10 @@ export const useAccountStore = defineStore('accountList',{
         },
         deleteAccount(id) {
             this.accounts = this.accounts.filter(account => account.id !== id);
+        },
+        updateAccount(account, props) {
+            let index = this.accounts.findIndex(item => item.id === account.id);
+            this.accounts[index] = {...account, ...props};
         },
         clearAccounts() {
             this.accounts = [];

@@ -3,30 +3,9 @@
 
     <NoInvoiceDueDialog :open="invoice.data === true" />
 
-    <TransitionRoot as="template" :show="state.overlayOpen">
-      <Dialog as="div" class="relative z-10" @close="state.overlayOpen = false">
-        <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 z-10 overflow-y-auto">
-          <div class="flex min-h-full items-end justify-center p-4 sm:items-center sm:p-0">
-            <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" enter-to="opacity-100 translate-y-0 sm:scale-100" leave="ease-in duration-200" leave-from="opacity-100 translate-y-0 sm:scale-100" leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
-              <DialogPanel class="relative transform overflow-hidden rounded-lg bg-slate-100 px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div>
-                  <InvoiceDetails :invoice="invoice.data" />
-                </div>
-                <div class="mt-5 sm:mt-6">
-                  <button type="button" class="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm" @click="state.overlayOpen = false">
-                    Close this window
-                  </button>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+    <template v-if="typeof invoice.data === 'object'">
+      <InvoiceDialog :open="state.overlayOpen" :invoice="invoice.data" />
+    </template>
 
     <div class="relative sm:py-16 mb-10">
       <div aria-hidden="true" class="hidden sm:block">
@@ -108,10 +87,10 @@ import {onMounted, reactive, ref, watch} from "vue";
 import {toggleTransition} from "@rvanbaalen/transitionjs";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import Alert from "./components/Alert.vue";
-import InvoiceDetails from "./components/InvoiceDetails.vue";
 import {useAccountStore} from "./store/accountStore.js";
 import AccountList from "./components/AccountList.vue";
 import NoInvoiceDueDialog from "./components/NoInvoiceDueDialog.vue";
+import InvoiceDialog from "./components/InvoiceDialog.vue";
 
 const store = useAccountStore();
 const version = __APP_VERSION__;
