@@ -63,8 +63,6 @@
 </template>
 
 <script setup>
-import {PaperClipIcon} from '@heroicons/vue/20/solid';
-import {onMounted, ref} from "vue";
 import SelectableData from "./SelectableData.vue";
 import dayjs from "dayjs";
 const props = defineProps({

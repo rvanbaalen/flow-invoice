@@ -1,6 +1,8 @@
 <template>
   <div class="bg-white py-16 sm:py-24">
 
+    <NoInvoiceDueDialog :open="invoice.data === true" />
+
     <TransitionRoot as="template" :show="state.overlayOpen">
       <Dialog as="div" class="relative z-10" @close="state.overlayOpen = false">
         <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in duration-200" leave-from="opacity-100" leave-to="opacity-0">
@@ -88,23 +90,32 @@
         </div>
       </div>
     </div>
+
+    <AccountList @select-account="(acc) => account.number = acc.number" />
+
+    <div class="mt-20 border-t pt-3 text-center text-slate-300 max-w-3xl mx-auto text-sm">
+      <p>No information is stored on servers, account history is shown based in your browsers' history.</p>
+      <p>This is not an official application of UTS/Flow Curaçao.</p>
+    </div>
   </div>
 </template>
 
 <script setup>
 import '@rvanbaalen/transitionjs/src/transitions.css';
-import {getAccountDetails, loadAccountNumber} from "./accountService.js";
+import {getAccountDetails} from "./accountService.js";
 import {onMounted, reactive, ref, watch} from "vue";
 import {toggleTransition} from "@rvanbaalen/transitionjs";
 import {Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot} from "@headlessui/vue";
 import Alert from "./components/Alert.vue";
 import InvoiceDetails from "./components/InvoiceDetails.vue";
+import {useAccountStore} from "./store/accountStore.js";
+import AccountList from "./components/AccountList.vue";
+import NoInvoiceDueDialog from "./components/NoInvoiceDueDialog.vue";
+
+const store = useAccountStore();
 
 let account = reactive({number: ""});
-loadAccountNumber()
-  .then((acc) => {
-    account.number = acc;
-  });
+account.number = store.mostRecentAccount?.number;
 
 const accountInput = ref();
 onMounted(() => {
@@ -140,9 +151,10 @@ const fetchAccountDetails = async () => {
 
   try {
     invoice.data = await getAccountDetails({accountNumber: account.number});
-    state.overlayOpen = true;
-    console.log('invoice', invoice.data.value);
-    console.log('open', state.overlayOpen);
+    store.addAccount({number: account.number, due: invoice.data !== true});
+    if (invoice.data !== true) {
+      state.overlayOpen = true;
+    }
   } catch (e) {
     if (e === false) {
       state.error = true;

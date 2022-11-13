@@ -1,7 +1,7 @@
 {
   "name": "flow-invoices",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,9 @@
     "@heroicons/vue": "^2.0.13",
     "@rvanbaalen/domjs": "^1.0.0",
     "@rvanbaalen/transitionjs": "^1.0.1",
+    "@vueuse/core": "^9.5.0",
     "dayjs": "^1.11.6",
+    "pinia": "^2.0.23",
     "vue": "^3.2.41"
   },
   "devDependencies": {
