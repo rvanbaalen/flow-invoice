@@ -73,7 +73,8 @@
     <AccountList @select-account="(acc) => account.number = acc.number" />
 
     <div class="mt-20 border-t pt-3 text-center text-slate-300 max-w-3xl mx-auto text-sm">
-      <p>No information is stored on servers, account history is shown based in your browsers' history.</p>
+      <p>This is a free and open-source tool.</p>
+      <p>No information is stored on servers, account history is shown based in your browsers' local storage.</p>
       <p>This is not an official application of UTS/Flow Curaçao.</p>
       <p class="mt-4"> v{{ version }}</p>
     </div>
