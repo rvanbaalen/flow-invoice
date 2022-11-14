@@ -13,7 +13,7 @@ cd dist
 echo > .nojekyll
 
 # if you are deploying to a custom domain
-echo 'flowinvoice.js.org' > CNAME
+#echo 'flowinvoice.js.org' > CNAME
 
 PACKAGE_VERSION=$(cat ./package.json \
   | grep version \
