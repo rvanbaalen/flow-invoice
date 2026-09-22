@@ -29,7 +29,7 @@
           </div>
           <div class="relative">
             <div class="sm:text-center">
-              <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">View your outstanding Flow invoices.</h2>
+              <h1 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">View your outstanding Flow invoices.</h1>
               <p class="mx-auto mt-6 max-w-2xl text-lg text-indigo-200">Enter your account number below to view your outstanding invoices.</p>
               <TransitionRoot
                 :show="state.error"
